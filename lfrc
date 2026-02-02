@@ -1,0 +1,45 @@
+# Basic settings
+set hidden true
+set icons true
+
+# File picker: write selection to output file and quit
+cmd pick %{{
+    out="$LF_SELECTION_OUTPUT"
+    if [ -n "$out" ]; then
+        if [ -n "$fs" ]; then
+            printf '%s\n' $fs > "$out"
+        else
+            printf '%s\n' "$f" > "$out"
+        fi
+    fi
+    lf -remote "send $id quit"
+}}
+
+# Fuzzy file picker: use fzf to select files in current directory
+cmd fzfpick ${{
+    out="$LF_SELECTION_OUTPUT"
+    sel=$(fd --type f --hidden 2>/dev/null | fzf -m --preview 'bat --color=always {} 2>/dev/null || cat {}')
+    if [ -n "$sel" ] && [ -n "$out" ]; then
+        printf '%s\n' "$sel" | while read -r file; do
+            printf '%s/%s\n' "$PWD" "$file"
+        done > "$out"
+        lf -remote "send $id quit"
+    fi
+}}
+
+# Map enter to pick
+map <enter> pick
+map l pick
+map / fzfpick
+
+# Toggle selection with v (vim-style)
+map v :toggle; down
+
+# Leader key mappings (space)
+map <space>   # clear default space binding
+map <space>f cd /home/n0ko/datadog_terraform/forest/
+map <space>p cd /home/n0ko/Portfolio/
+map <space>d cd /home/n0ko/Downloads/
+
+# Escape to quit without selecting
+map <esc> quit
