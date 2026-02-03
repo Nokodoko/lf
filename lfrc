@@ -30,7 +30,9 @@ cmd fzfpick ${{
     case "$key" in
         ctrl-v)
             # Open in nvim in a new full-size (tiled) terminal
-            wezterm start --always-new-process -- nvim $files
+            # Convert relative paths to absolute
+            abs_files=$(echo "$files" | while read -r f; do printf '%s/%s\n' "$PWD" "$f"; done)
+            wezterm start --always-new-process --cwd "$PWD" -- nvim $abs_files
             ;;
         enter|"")
             # Pick and quit
