@@ -30,7 +30,7 @@ cmd fzfpick ${{
     case "$key" in
         ctrl-v)
             # Open in nvim in a new full-size (tiled) terminal
-            wezterm start --wait -- nvim $files
+            wezterm start --always-new-process -- nvim $files
             ;;
         enter|"")
             # Pick and quit
