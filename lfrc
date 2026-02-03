@@ -18,9 +18,10 @@ cmd pick %{{
 # Fuzzy file picker: use fzf to select files with action keys
 cmd fzfpick ${{
     sel=$(fd --type f --hidden 2>/dev/null | fzf -m \
-        --expect=ctrl-v,enter \
+        --expect=ctrl-v,ctrl-a,enter \
+        --bind='v:toggle+down' \
         --preview 'bat --color=always {} 2>/dev/null || cat {}' \
-        --header 'enter=pick, ctrl-v=nvim')
+        --header 'enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
@@ -34,8 +35,18 @@ cmd fzfpick ${{
             wezterm start --cwd "$PWD" -- nvim $abs_files 2>/dev/null
             lf -remote "send $id quit"
             ;;
+        ctrl-a)
+            # Attach files (write to output and quit)
+            out="$LF_SELECTION_OUTPUT"
+            if [ -n "$out" ]; then
+                printf '%s\n' "$files" | while read -r file; do
+                    printf '%s/%s\n' "$PWD" "$file"
+                done > "$out"
+            fi
+            lf -remote "send $id quit"
+            ;;
         enter|"")
-            # Pick and quit
+            # Pick and quit (only in picker mode)
             out="$LF_SELECTION_OUTPUT"
             if [ -n "$out" ]; then
                 printf '%s\n' "$files" | while read -r file; do
@@ -50,7 +61,7 @@ cmd fzfpick ${{
 # Map enter to pick
 map <enter> pick
 map l pick
-map / fzfpick
+map <space>/ fzfpick
 
 # Toggle selection with v (vim-style)
 map v :toggle; down
