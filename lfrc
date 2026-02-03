@@ -18,9 +18,9 @@ cmd pick %{{
 # Fuzzy file picker: use fzf to select files with action keys
 cmd fzfpick ${{
     sel=$(fd --type f --hidden 2>/dev/null | fzf -m \
-        --expect=alt-v,enter \
+        --expect=ctrl-v,enter \
         --preview 'bat --color=always {} 2>/dev/null || cat {}' \
-        --header 'enter=pick, alt-v=nvim')
+        --header 'enter=pick, ctrl-v=nvim')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
@@ -28,7 +28,7 @@ cmd fzfpick ${{
     [ -z "$files" ] && exit 0
 
     case "$key" in
-        alt-v)
+        ctrl-v)
             # Open in nvim in a new full-size (tiled) terminal
             wezterm start --wait -- nvim $files
             ;;
