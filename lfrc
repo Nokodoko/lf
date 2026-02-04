@@ -83,7 +83,95 @@ map v :toggle; down
 map <space>   # clear default space binding
 map <space>f cd /home/n0ko/datadog_terraform/forest/
 map <space>p cd /home/n0ko/Portfolio/
-map <space>d cd /home/n0ko/Downloads/
+map <space>do cd /home/n0ko/Downloads/
+
+# Datadog Core Configurations (integrations-core)
+cmd ddogcore ${{
+    dir="/home/n0ko/Programs/integrations-core"
+    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+        --expect=ctrl-v,ctrl-a,enter \
+        --bind='v:toggle+down' \
+        --header 'Datadog Core | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+
+    key=$(echo "$sel" | head -1)
+    files=$(echo "$sel" | tail -n +2)
+
+    [ -z "$files" ] && exit 0
+
+    case "$key" in
+        ctrl-v)
+            wezterm start --cwd "$dir" -- nvim $files 2>/dev/null
+            lf -remote "send $id quit"
+            ;;
+        ctrl-a|enter|"")
+            out="$LF_SELECTION_OUTPUT"
+            if [ -n "$out" ]; then
+                printf '%s\n' "$files" > "$out"
+            fi
+            lf -remote "send $id quit"
+            ;;
+    esac
+}}
+
+# Datadog Extra Configurations (integrations-extras)
+cmd ddogextra ${{
+    dir="/home/n0ko/Programs/datadog__integrations-extras"
+    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+        --expect=ctrl-v,ctrl-a,enter \
+        --bind='v:toggle+down' \
+        --header 'Datadog Extra | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+
+    key=$(echo "$sel" | head -1)
+    files=$(echo "$sel" | tail -n +2)
+
+    [ -z "$files" ] && exit 0
+
+    case "$key" in
+        ctrl-v)
+            wezterm start --cwd "$dir" -- nvim $files 2>/dev/null
+            lf -remote "send $id quit"
+            ;;
+        ctrl-a|enter|"")
+            out="$LF_SELECTION_OUTPUT"
+            if [ -n "$out" ]; then
+                printf '%s\n' "$files" > "$out"
+            fi
+            lf -remote "send $id quit"
+            ;;
+    esac
+}}
+
+# Datadog In-Use Configurations (conf.d)
+cmd ddogconf ${{
+    dir="/home/n0ko/Portfolio/ddog_configs/conf.d"
+    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+        --expect=ctrl-v,ctrl-a,enter \
+        --bind='v:toggle+down' \
+        --header 'Datadog Conf.d | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+
+    key=$(echo "$sel" | head -1)
+    files=$(echo "$sel" | tail -n +2)
+
+    [ -z "$files" ] && exit 0
+
+    case "$key" in
+        ctrl-v)
+            wezterm start --cwd "$dir" -- nvim $files 2>/dev/null
+            lf -remote "send $id quit"
+            ;;
+        ctrl-a|enter|"")
+            out="$LF_SELECTION_OUTPUT"
+            if [ -n "$out" ]; then
+                printf '%s\n' "$files" > "$out"
+            fi
+            lf -remote "send $id quit"
+            ;;
+    esac
+}}
+
+map <space>dco ddogcore
+map <space>dce ddogextra
+map <space>dcc ddogconf
 
 # Escape to quit without selecting
 map <esc> quit
