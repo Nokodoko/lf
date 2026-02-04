@@ -91,6 +91,7 @@ cmd ddogcore ${{
     sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
+        --delimiter '/' --with-nth 5.. \
         --header 'Datadog Core | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
 
     key=$(echo "$sel" | head -1)
@@ -119,6 +120,7 @@ cmd ddogextra ${{
     sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
+        --delimiter '/' --with-nth 5.. \
         --header 'Datadog Extra | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
 
     key=$(echo "$sel" | head -1)
@@ -147,6 +149,7 @@ cmd ddogconf ${{
     sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
+        --delimiter '/' --with-nth 6.. \
         --header 'Datadog Conf.d | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
 
     key=$(echo "$sel" | head -1)
