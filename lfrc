@@ -15,6 +15,18 @@ cmd pick %{{
     lf -remote "send $id quit"
 }}
 
+# Fuzzy directory picker: search dirs, cd, then open file picker
+cmd fzfdir ${{
+    dir=$(fd --type d --hidden 2>/dev/null | fzf \
+        --preview 'ls -la {}' \
+        --header 'Select directory')
+
+    [ -z "$dir" ] && exit 0
+
+    lf -remote "send $id cd \"$PWD/$dir\""
+    lf -remote "send $id fzfpick"
+}}
+
 # Fuzzy file picker: use fzf to select files with action keys
 cmd fzfpick ${{
     sel=$(fd --type f --hidden 2>/dev/null | fzf -m \
@@ -61,7 +73,7 @@ cmd fzfpick ${{
 # Map enter to pick
 map <enter> pick
 map l pick
-map <space>/ fzfpick
+map / fzfdir
 
 # Toggle selection with v (vim-style)
 map v :toggle; down
