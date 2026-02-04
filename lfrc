@@ -74,6 +74,7 @@ cmd fzfpick ${{
 map <enter> pick
 map l pick
 map / fzfdir
+map <space>/ fzfpick
 
 # Toggle selection with v (vim-style)
 map v :toggle; down
