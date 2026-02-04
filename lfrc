@@ -115,7 +115,7 @@ cmd ddogcore ${{
 
 # Datadog Extra Configurations (integrations-extras)
 cmd ddogextra ${{
-    dir="/home/n0ko/Programs/datadog__integrations-extras"
+    dir="/home/n0ko/Programs/integrations-extras"
     sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
