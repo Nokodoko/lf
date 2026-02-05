@@ -17,7 +17,7 @@ cmd pick %{{
 
 # Fuzzy directory picker: search dirs, cd, then open file picker
 cmd fzfdir ${{
-    dir=$(fd --type d --hidden 2>/dev/null | fzf \
+    dir=$(/home/n0ko/.cargo/bin/fd --type d --hidden 2>/dev/null | fzf \
         --preview 'ls -la {}' \
         --header 'Select directory')
 
@@ -29,10 +29,10 @@ cmd fzfdir ${{
 
 # Fuzzy file picker: use fzf to select files with action keys
 cmd fzfpick ${{
-    sel=$(fd --type f --hidden 2>/dev/null | fzf -m \
+    sel=$(/home/n0ko/.cargo/bin/fd --type f --hidden 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
-        --preview 'bat --color=always {} 2>/dev/null || cat {}' \
+        --preview '/home/n0ko/.cargo/bin/bat --color=always {} 2>/dev/null || cat {}' \
         --header 'enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
 
     key=$(echo "$sel" | head -1)
@@ -88,7 +88,7 @@ map <space>do cd /home/n0ko/Downloads/
 # Datadog Core Configurations (integrations-core)
 cmd ddogcore ${{
     dir="/home/n0ko/Programs/integrations-core"
-    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+    sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
@@ -117,7 +117,7 @@ cmd ddogcore ${{
 # Datadog Extra Configurations (integrations-extras)
 cmd ddogextra ${{
     dir="/home/n0ko/Programs/integrations-extras"
-    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+    sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
@@ -146,7 +146,7 @@ cmd ddogextra ${{
 # Datadog In-Use Configurations (conf.d)
 cmd ddogconf ${{
     dir="/home/n0ko/Portfolio/ddog_configs/conf.d"
-    sel=$(fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
+    sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
