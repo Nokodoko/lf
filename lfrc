@@ -31,9 +31,8 @@ cmd fzfdir ${{
 cmd fzfpick ${{
     sel=$(/home/n0ko/.cargo/bin/fd --type f --hidden 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
-        --bind='v:toggle+down' \
         --preview '/home/n0ko/.cargo/bin/bat --color=always {} 2>/dev/null || cat {}' \
-        --header 'enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+        --header 'enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
@@ -90,9 +89,8 @@ cmd ddogcore ${{
     dir="/home/n0ko/Programs/integrations-core"
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
-        --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
-        --header 'Datadog Core | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+        --header 'Datadog Core | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
@@ -119,9 +117,8 @@ cmd ddogextra ${{
     dir="/home/n0ko/Programs/integrations-extras"
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
-        --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
-        --header 'Datadog Extra | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+        --header 'Datadog Extra | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
@@ -148,9 +145,8 @@ cmd ddogconf ${{
     dir="/home/n0ko/Portfolio/ddog_configs/conf.d"
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
-        --bind='v:toggle+down' \
         --delimiter '/' --with-nth 6.. \
-        --header 'Datadog Conf.d | enter=pick, ctrl-v=nvim, ctrl-a=attach, v=select')
+        --header 'Datadog Conf.d | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
     files=$(echo "$sel" | tail -n +2)
