@@ -90,6 +90,7 @@ cmd ddogcore ${{
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --delimiter '/' --with-nth 6.. \
+        --preview '/home/n0ko/.cargo/bin/bat --color=always {} 2>/dev/null || cat {}' \
         --header 'Datadog Core | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
@@ -118,6 +119,7 @@ cmd ddogextra ${{
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --delimiter '/' --with-nth 6.. \
+        --preview '/home/n0ko/.cargo/bin/bat --color=always {} 2>/dev/null || cat {}' \
         --header 'Datadog Extra | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
@@ -142,10 +144,11 @@ cmd ddogextra ${{
 
 # Datadog In-Use Configurations (conf.d)
 cmd ddogconf ${{
-    dir="/home/n0ko/Portfolio/ddog_configs/conf.d"
+    dir="/home/n0ko/Programs/datadog/conf.d"
     sel=$(/home/n0ko/.cargo/bin/fd -tf -e yaml -e yml -e example . "$dir" 2>/dev/null | fzf -m \
         --expect=ctrl-v,ctrl-a,enter \
         --delimiter '/' --with-nth 6.. \
+        --preview '/home/n0ko/.cargo/bin/bat --color=always {} 2>/dev/null || cat {}' \
         --header 'Datadog Conf.d | enter=pick, ctrl-v=nvim, ctrl-a=attach')
 
     key=$(echo "$sel" | head -1)
@@ -171,6 +174,85 @@ cmd ddogconf ${{
 map <space>dco ddogcore
 map <space>dce ddogextra
 map <space>dcc ddogconf
+
+# SSH remote file picker: browse and fetch files from SSH hosts
+cmd sshpick ${{
+    tmpdir="/tmp/lf-ssh-attach"
+
+    # Parse hosts from /etc/hosts, skip comments, blanks, and localhost entries
+    hosts=$(awk '!/^#/ && !/^$/ && !/^127\./ && !/^::1/ && $1 != "localhost" {
+        for (i=2; i<=NF; i++) print $i
+    }' /etc/hosts | sort -u)
+
+    [ -z "$hosts" ] && exit 0
+
+    # Step 1: Pick an SSH host
+    host=$(printf '%s\n' "$hosts" | fzf \
+        --header 'SSH host | enter=connect')
+
+    [ -z "$host" ] && exit 0
+
+    # Step 2: List remote files (try fd, fall back to find)
+    remote_files=$(ssh -o ConnectTimeout=5 "$host" \
+        'if command -v fd >/dev/null 2>&1; then fd -tf --hidden -E .git 2>/dev/null; else find . -type f -not -path "*/.git/*" 2>/dev/null; fi' \
+        2>/dev/null)
+
+    if [ $? -ne 0 ] || [ -z "$remote_files" ]; then
+        lf -remote "send $id echoerr 'SSH: failed to list files on $host'"
+        exit 1
+    fi
+
+    # Step 3: Pick remote file(s)
+    sel=$(printf '%s\n' "$remote_files" | fzf -m \
+        --expect=ctrl-v,ctrl-a,enter \
+        --header "[$host] enter=pick, ctrl-v=nvim, ctrl-a=attach")
+
+    key=$(echo "$sel" | head -1)
+    files=$(echo "$sel" | tail -n +2)
+
+    [ -z "$files" ] && exit 0
+
+    # Clean old downloads, prepare temp dir
+    rm -rf "$tmpdir"
+    mkdir -p "$tmpdir"
+
+    # Step 4: scp selected files locally
+    local_paths=""
+    while IFS= read -r rfile; do
+        basename=$(echo "$rfile" | sed 's|.*/||')
+        localfile="$tmpdir/$basename"
+        scp -q "$host:$rfile" "$localfile" 2>/dev/null
+        if [ $? -eq 0 ]; then
+            local_paths="${local_paths}${localfile}
+"
+        fi
+    done <<EOF
+$files
+EOF
+
+    local_paths=$(printf '%s' "$local_paths" | sed '/^$/d')
+
+    [ -z "$local_paths" ] && {
+        lf -remote "send $id echoerr 'SSH: scp failed for all files'"
+        exit 1
+    }
+
+    case "$key" in
+        ctrl-v)
+            wezterm start --cwd "$tmpdir" -- nvim $local_paths 2>/dev/null
+            lf -remote "send $id quit"
+            ;;
+        ctrl-a|enter|"")
+            out="$LF_SELECTION_OUTPUT"
+            if [ -n "$out" ]; then
+                printf '%s\n' "$local_paths" > "$out"
+            fi
+            lf -remote "send $id quit"
+            ;;
+    esac
+}}
+
+map <space>s sshpick
 
 # Escape to quit without selecting
 map <esc> quit
